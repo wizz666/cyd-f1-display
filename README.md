@@ -4,6 +4,8 @@
 
 A full-featured Formula 1 race display for the **ESP32-2432S028** ("Cheap Yellow Display") built with ESPHome and Home Assistant. Shows countdown to next race, live race data, championship standings, circuit layout images and more — all updating automatically without reflashing.
 
+![CYD F1 Display](screenshot.jpeg)
+
 ---
 
 ## Screenshots / Layout
