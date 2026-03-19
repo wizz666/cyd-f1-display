@@ -1,0 +1,500 @@
+esphome:
+  name: cyd-countdown
+  friendly_name: "CYD F1 Countdown"
+  on_boot:
+    priority: 600
+    then:
+      - output.turn_on: backlight_pin
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: "CYD Fallback"
+    password: !secret fallback_ap_password
+
+captive_portal:
+
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+logger:
+  level: WARN
+
+# ── Tid (synkad med HA) ───────────────────────────────────────────────────────
+time:
+  - platform: homeassistant
+    id: ha_time
+
+# ── SPI ──────────────────────────────────────────────────────────────────────
+spi:
+  clk_pin: GPIO14
+  mosi_pin: GPIO13
+  miso_pin: GPIO12
+
+# ── Bakgrundsljus ─────────────────────────────────────────────────────────────
+output:
+  - platform: gpio
+    pin: GPIO21
+    id: backlight_pin
+
+# ── Bilder ───────────────────────────────────────────────────────────────────
+image:
+  - file: f1_logo.png
+    id: f1_logo
+    type: RGB
+
+  - file: circuits/australia.png
+    id: circuit_australia
+    type: RGB
+  - file: circuits/china.png
+    id: circuit_china
+    type: RGB
+  - file: circuits/japan.png
+    id: circuit_japan
+    type: RGB
+  - file: circuits/miami.png
+    id: circuit_miami
+    type: RGB
+  - file: circuits/canada.png
+    id: circuit_canada
+    type: RGB
+  - file: circuits/monaco.png
+    id: circuit_monaco
+    type: RGB
+  - file: circuits/barcelona-catalunya.png
+    id: circuit_barcelona_catalunya
+    type: RGB
+  - file: circuits/austria.png
+    id: circuit_austria
+    type: RGB
+  - file: circuits/great-britain.png
+    id: circuit_great_britain
+    type: RGB
+  - file: circuits/belgium.png
+    id: circuit_belgium
+    type: RGB
+  - file: circuits/hungary.png
+    id: circuit_hungary
+    type: RGB
+  - file: circuits/netherlands.png
+    id: circuit_netherlands
+    type: RGB
+  - file: circuits/italy.png
+    id: circuit_italy
+    type: RGB
+  - file: circuits/spain.png
+    id: circuit_spain
+    type: RGB
+  - file: circuits/azerbaijan.png
+    id: circuit_azerbaijan
+    type: RGB
+  - file: circuits/singapore.png
+    id: circuit_singapore
+    type: RGB
+  - file: circuits/united-states.png
+    id: circuit_united_states
+    type: RGB
+  - file: circuits/mexico.png
+    id: circuit_mexico
+    type: RGB
+  - file: circuits/brazil.png
+    id: circuit_brazil
+    type: RGB
+  - file: circuits/las-vegas.png
+    id: circuit_las_vegas
+    type: RGB
+  - file: circuits/qatar.png
+    id: circuit_qatar
+    type: RGB
+  - file: circuits/united-arab-emirates.png
+    id: circuit_united_arab_emirates
+    type: RGB
+
+# ── Fonter ────────────────────────────────────────────────────────────────────
+font:
+  - file: "Roboto-Regular.ttf"
+    id: font_xs
+    size: 12
+    glyphs: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789åäöÅÄÖ°– .,:;-+/()!?"
+
+  - file: "Roboto-Regular.ttf"
+    id: font_sm
+    size: 15
+    glyphs: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789åäöÅÄÖ°– .,:;-+/()!?"
+
+  - file: "Roboto-Bold.ttf"
+    id: font_md
+    size: 20
+    glyphs: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789åäöÅÄÖ°– .,:;-+/()!?"
+
+
+# ── HA text-sensorer (sätts av pyscript/cyd_f1_esphome.py) ───────────────────
+text_sensor:
+  - platform: homeassistant
+    id: cyd_race_name
+    entity_id: sensor.cyd_race_name
+
+  - platform: homeassistant
+    id: cyd_circuit
+    entity_id: sensor.cyd_circuit_name
+
+  - platform: homeassistant
+    id: cyd_qual_date
+    entity_id: sensor.cyd_qual_date
+
+  - platform: homeassistant
+    id: cyd_qual_count
+    entity_id: sensor.cyd_qual_count
+
+  - platform: homeassistant
+    id: cyd_qual_color
+    entity_id: sensor.cyd_qual_color
+
+  - platform: homeassistant
+    id: cyd_sprint_date
+    entity_id: sensor.cyd_sprint_date
+
+  - platform: homeassistant
+    id: cyd_sprint_count
+    entity_id: sensor.cyd_sprint_count
+
+  - platform: homeassistant
+    id: cyd_sprint_color
+    entity_id: sensor.cyd_sprint_color
+
+  - platform: homeassistant
+    id: cyd_sprint_show
+    entity_id: sensor.cyd_sprint_show
+
+  - platform: homeassistant
+    id: cyd_race_date
+    entity_id: sensor.cyd_race_date
+
+  - platform: homeassistant
+    id: cyd_race_count
+    entity_id: sensor.cyd_race_count
+
+  - platform: homeassistant
+    id: cyd_race_color
+    entity_id: sensor.cyd_race_color
+
+  - platform: homeassistant
+    id: cyd_last_race
+    entity_id: sensor.cyd_last_race
+
+  - platform: homeassistant
+    id: cyd_p1
+    entity_id: sensor.cyd_p1
+
+  - platform: homeassistant
+    id: cyd_p2
+    entity_id: sensor.cyd_p2
+
+  - platform: homeassistant
+    id: cyd_p3
+    entity_id: sensor.cyd_p3
+
+  - platform: homeassistant
+    id: cyd_ms1
+    entity_id: sensor.cyd_ms1
+
+  - platform: homeassistant
+    id: cyd_ms2
+    entity_id: sensor.cyd_ms2
+
+  - platform: homeassistant
+    id: cyd_ms3
+    entity_id: sensor.cyd_ms3
+
+  - platform: homeassistant
+    id: cyd_ms4
+    entity_id: sensor.cyd_ms4
+
+  - platform: homeassistant
+    id: cyd_ms5
+    entity_id: sensor.cyd_ms5
+
+  - platform: homeassistant
+    id: cyd_circuit_slug
+    entity_id: sensor.cyd_circuit_slug
+
+  - platform: homeassistant
+    id: cyd_live_mode
+    entity_id: sensor.cyd_live_mode
+
+  - platform: homeassistant
+    id: cyd_flag
+    entity_id: sensor.cyd_flag
+
+  - platform: homeassistant
+    id: cyd_flag_color
+    entity_id: sensor.cyd_flag_color
+
+  - platform: homeassistant
+    id: cyd_lap
+    entity_id: sensor.cyd_lap
+
+  - platform: homeassistant
+    id: cyd_rc_line1
+    entity_id: sensor.cyd_rc_line1
+
+  - platform: homeassistant
+    id: cyd_rc_line2
+    entity_id: sensor.cyd_rc_line2
+
+  - platform: homeassistant
+    id: cyd_d1_pos
+    entity_id: sensor.cyd_d1_pos
+  - platform: homeassistant
+    id: cyd_d1_name
+    entity_id: sensor.cyd_d1_name
+  - platform: homeassistant
+    id: cyd_d1_gap
+    entity_id: sensor.cyd_d1_gap
+  - platform: homeassistant
+    id: cyd_d1_tyre
+    entity_id: sensor.cyd_d1_tyre
+
+  - platform: homeassistant
+    id: cyd_d2_pos
+    entity_id: sensor.cyd_d2_pos
+  - platform: homeassistant
+    id: cyd_d2_name
+    entity_id: sensor.cyd_d2_name
+  - platform: homeassistant
+    id: cyd_d2_gap
+    entity_id: sensor.cyd_d2_gap
+  - platform: homeassistant
+    id: cyd_d2_tyre
+    entity_id: sensor.cyd_d2_tyre
+
+  - platform: homeassistant
+    id: cyd_d3_pos
+    entity_id: sensor.cyd_d3_pos
+  - platform: homeassistant
+    id: cyd_d3_name
+    entity_id: sensor.cyd_d3_name
+  - platform: homeassistant
+    id: cyd_d3_gap
+    entity_id: sensor.cyd_d3_gap
+  - platform: homeassistant
+    id: cyd_d3_tyre
+    entity_id: sensor.cyd_d3_tyre
+
+  - platform: homeassistant
+    id: cyd_circuit_time
+    entity_id: sensor.cyd_circuit_time
+
+  - platform: homeassistant
+    id: cyd_circuit_temp
+    entity_id: sensor.cyd_circuit_temp
+
+# ── Display (ILI9341, 320x240 landscape) ─────────────────────────────────────
+display:
+  - platform: ili9xxx
+    model: M5STACK
+    cs_pin: GPIO15
+    dc_pin: GPIO2
+    color_palette: 8BIT
+    invert_colors: false
+    transform:
+      mirror_x: true
+    update_interval: 30s
+    lambda: |-
+
+      // Färghjälp: "red"/"yellow"/"green" → Color
+      auto col = [](const std::string& c) -> Color {
+        if (c == "green")  return Color(14, 90, 42);
+        if (c == "yellow") return Color(250, 204, 21);
+        return Color(239, 68, 68);
+      };
+
+      // Bakgrund
+      it.fill(Color(13, 17, 23));
+
+      // ── HEADER (y:0-32) ──────────────────────────────────────────────────
+
+      it.image(2, 4, id(f1_logo));
+
+      // Race + bana (centrerade mellan logo och höger info)
+      it.print(155, 3,  id(font_xs), Color(255, 255, 255), TextAlign::TOP_CENTER, id(cyd_race_name).state.c_str());
+      it.print(155, 17, id(font_xs), Color(100, 116, 139), TextAlign::TOP_CENTER, id(cyd_circuit).state.c_str());
+
+      // Bantemp (höger, i linje med race name, vit)
+      {
+        std::string ct = id(cyd_circuit_temp).state;
+        bool valid = !ct.empty() && ct != "\xe2\x80\x93";
+        std::string ct_disp = valid ? (ct + "\xC2\xB0""C") : ct;
+        it.print(315, 3, id(font_xs), Color(255, 255, 255), TextAlign::TOP_RIGHT, ct_disp.c_str());
+      }
+
+      // Circuit lokaltid (höger, i linje med circuit name, grå)
+      it.print(315, 17, id(font_xs), Color(100, 116, 139), TextAlign::TOP_RIGHT, id(cyd_circuit_time).state.c_str());
+
+      auto now = id(ha_time).now();
+
+      // ── SEPARATORER ──────────────────────────────────────────────────────
+      it.horizontal_line(0,   33,  320, Color(30, 41, 59));  // header
+      it.vertical_line(159,   34,  173, Color(30, 41, 59));  // vertikal mittlinje (y:34-207)
+      it.horizontal_line(161, 109, 159, Color(30, 41, 59));  // höger: mellan senaste race och standings
+      it.horizontal_line(161, 207, 159, Color(30, 41, 59));  // höger: under förarmästerskapet
+
+      // ── VÄNSTER: Live FÖRARE / SPRINT / KVAL / RACE ─────────────────────
+      bool show_sprint = id(cyd_sprint_show).state == "1";
+      int  circuit_y   = live ? 155 : (show_sprint ? 155 : 150);
+
+      // Tyre-färg: första bokstaven i däcksträngen → Color
+      auto tc = [](const std::string& t) -> Color {
+        if (!t.empty()) {
+          if (t[0] == 'S') return Color(239, 68,  68);   // Soft  – röd
+          if (t[0] == 'M') return Color(250, 204, 21);   // Med   – gul
+          if (t[0] == 'I') return Color(57,  211, 83);   // Inter – grön
+          if (t[0] == 'W') return Color(100, 149, 237);  // Wet   – blå
+        }
+        return Color(255, 255, 255);  // Hard – vit
+      };
+
+      if (live) {
+        // ── LIVE: Dina följda förare ──────────────────────────────────────
+        it.print(5, 40, id(font_xs), Color(100, 116, 139), "DINA FÖRARE");
+
+        // Hjälplambda: position → färg
+        auto pc = [](int p) -> Color {
+          return p == 1 ? Color(255, 215, 0) :
+                 p == 2 ? Color(192, 192, 192) :
+                 p == 3 ? Color(205, 127, 50) :
+                          Color(255, 255, 255);
+        };
+
+        // Förare 1
+        { int p = atoi(id(cyd_d1_pos).state.c_str());
+          it.print(5,  54, id(font_xs), pc(p),                id(cyd_d1_pos).state.c_str());
+          it.print(22, 54, id(font_xs), Color(255, 255, 255), id(cyd_d1_name).state.c_str());
+          it.print(5,  68, id(font_xs), Color(100, 116, 139), id(cyd_d1_gap).state.c_str());
+          it.print(90, 68, id(font_xs), tc(id(cyd_d1_tyre).state), id(cyd_d1_tyre).state.c_str()); }
+
+        // Förare 2
+        { int p = atoi(id(cyd_d2_pos).state.c_str());
+          it.print(5,  86, id(font_xs), pc(p),                id(cyd_d2_pos).state.c_str());
+          it.print(22, 86, id(font_xs), Color(255, 255, 255), id(cyd_d2_name).state.c_str());
+          it.print(5,  100, id(font_xs), Color(100, 116, 139), id(cyd_d2_gap).state.c_str());
+          it.print(90, 100, id(font_xs), tc(id(cyd_d2_tyre).state), id(cyd_d2_tyre).state.c_str()); }
+
+        // Förare 3
+        { int p = atoi(id(cyd_d3_pos).state.c_str());
+          it.print(5,  118, id(font_xs), pc(p),                id(cyd_d3_pos).state.c_str());
+          it.print(22, 118, id(font_xs), Color(255, 255, 255), id(cyd_d3_name).state.c_str());
+          it.print(5,  132, id(font_xs), Color(100, 116, 139), id(cyd_d3_gap).state.c_str());
+          it.print(90, 132, id(font_xs), tc(id(cyd_d3_tyre).state), id(cyd_d3_tyre).state.c_str()); }
+
+      } else if (show_sprint) {
+        // ── SPRINT-helg ───────────────────────────────────────────────────
+        it.print(5,  38, id(font_xs), Color(100, 116, 139), id(cyd_sprint_date).state.c_str());
+        it.print(5,  52, id(font_xs), Color(100, 116, 139), "SPRINT");
+        it.print(52, 52, id(font_xs), Color(255, 255, 255), id(cyd_sprint_count).state.c_str());
+        it.print(5,  72, id(font_xs), Color(100, 116, 139), id(cyd_qual_date).state.c_str());
+        it.print(5,  86, id(font_xs), Color(100, 116, 139), "KVAL");
+        it.print(38, 86, id(font_xs), Color(255, 255, 255), id(cyd_qual_count).state.c_str());
+        it.print(5,  106, id(font_xs), Color(100, 116, 139), id(cyd_race_date).state.c_str());
+        it.print(5,  120, id(font_xs), Color(100, 116, 139), "RACE");
+        it.print(38, 120, id(font_xs), Color(255, 255, 255), id(cyd_race_count).state.c_str());
+
+      } else {
+        // ── Normal helg ───────────────────────────────────────────────────
+        it.print(5,  38, id(font_xs), Color(100, 116, 139), id(cyd_qual_date).state.c_str());
+        it.print(5,  52, id(font_xs), Color(100, 116, 139), "KVAL");
+        it.print(38, 52, id(font_xs), Color(255, 255, 255), id(cyd_qual_count).state.c_str());
+        it.print(5,  75, id(font_xs), Color(100, 116, 139), id(cyd_race_date).state.c_str());
+        it.print(5,  89, id(font_xs), Color(100, 116, 139), "RACE");
+        it.print(38, 89, id(font_xs), Color(255, 255, 255), id(cyd_race_count).state.c_str());
+      }
+
+      // ── Circuit-bild (alltid synlig, y beror på läge) ─────────────────
+      {
+        const std::string& sl = id(cyd_circuit_slug).state;
+        if      (sl == "australia")            it.image(14, circuit_y, id(circuit_australia));
+        else if (sl == "china")                it.image(14, circuit_y, id(circuit_china));
+        else if (sl == "miami")                it.image(14, circuit_y, id(circuit_miami));
+        else if (sl == "canada")               it.image(14, circuit_y, id(circuit_canada));
+        else if (sl == "monaco")               it.image(14, circuit_y, id(circuit_monaco));
+        else if (sl == "barcelona-catalunya")  it.image(14, circuit_y, id(circuit_barcelona_catalunya));
+        else if (sl == "austria")              it.image(14, circuit_y, id(circuit_austria));
+        else if (sl == "great-britain")        it.image(14, circuit_y, id(circuit_great_britain));
+        else if (sl == "belgium")              it.image(14, circuit_y, id(circuit_belgium));
+        else if (sl == "hungary")              it.image(14, circuit_y, id(circuit_hungary));
+        else if (sl == "netherlands")          it.image(14, circuit_y, id(circuit_netherlands));
+        else if (sl == "italy")                it.image(14, circuit_y, id(circuit_italy));
+        else if (sl == "spain")                it.image(14, circuit_y, id(circuit_spain));
+        else if (sl == "azerbaijan")           it.image(14, circuit_y, id(circuit_azerbaijan));
+        else if (sl == "singapore")            it.image(14, circuit_y, id(circuit_singapore));
+        else if (sl == "united-states")        it.image(14, circuit_y, id(circuit_united_states));
+        else if (sl == "mexico")               it.image(14, circuit_y, id(circuit_mexico));
+        else if (sl == "brazil")               it.image(14, circuit_y, id(circuit_brazil));
+        else if (sl == "las-vegas")            it.image(14, circuit_y, id(circuit_las_vegas));
+        else if (sl == "qatar")                it.image(14, circuit_y, id(circuit_qatar));
+        else if (sl == "united-arab-emirates") it.image(14, circuit_y, id(circuit_united_arab_emirates));
+        else                                   it.image(14, circuit_y, id(circuit_japan));
+      }
+
+      // ── HÖGER: Senaste race / LIVE flagg+varv+RC (x:162-319, y:34-108) ──────
+
+      bool live = id(cyd_live_mode).state == "1";
+
+      if (live) {
+        it.print(165, 37, id(font_xs), Color(239, 68, 68),  "LIVE");
+        it.print(165, 51, id(font_xs), col(id(cyd_flag_color).state), id(cyd_flag).state.c_str());
+        it.print(165, 66, id(font_xs), Color(255, 255, 255), id(cyd_lap).state.c_str());
+        it.print(165, 80, id(font_xs), Color(100, 116, 139), id(cyd_rc_line1).state.c_str());
+        it.print(165, 94, id(font_xs), Color(100, 116, 139), id(cyd_rc_line2).state.c_str());
+      } else {
+        it.print(165, 37, id(font_xs), Color(100, 116, 139), "SENASTE RACE");
+        it.print(165, 51, id(font_xs), Color(255, 255, 255), id(cyd_last_race).state.c_str());
+        it.print(165, 66, id(font_xs), Color(255, 215, 0),   "1");
+        it.print(178, 66, id(font_xs), Color(255, 215, 0),   id(cyd_p1).state.c_str());
+        it.print(165, 80, id(font_xs), Color(192, 192, 192), "2");
+        it.print(178, 80, id(font_xs), Color(192, 192, 192), id(cyd_p2).state.c_str());
+        it.print(165, 94, id(font_xs), Color(205, 127, 50),  "3");
+        it.print(178, 94, id(font_xs), Color(205, 127, 50),  id(cyd_p3).state.c_str());
+      }
+
+      // ── HÖGER: Förarmästerskap / LIVE positioner (x:162-319, y:110-206) ─────
+
+      if (live) {
+        it.print(165, 113, id(font_xs), Color(239, 68, 68), "LIVE RACE");
+      } else {
+        it.print(165, 113, id(font_xs), Color(100, 116, 139), "FÖRARMÄSTERSKAPET");
+      }
+
+      it.print(165, 127, id(font_xs), Color(255, 215, 0),   "1");
+      it.print(178, 127, id(font_xs), Color(255, 215, 0),   id(cyd_ms1).state.c_str());
+      it.print(165, 141, id(font_xs), Color(192, 192, 192), "2");
+      it.print(178, 141, id(font_xs), Color(192, 192, 192), id(cyd_ms2).state.c_str());
+      it.print(165, 155, id(font_xs), Color(205, 127, 50),  "3");
+      it.print(178, 155, id(font_xs), Color(205, 127, 50),  id(cyd_ms3).state.c_str());
+      it.print(165, 169, id(font_xs), Color(255, 255, 255), "4");
+      it.print(178, 169, id(font_xs), Color(255, 255, 255), id(cyd_ms4).state.c_str());
+      it.print(165, 183, id(font_xs), Color(255, 255, 255), "5");
+      it.print(178, 183, id(font_xs), Color(255, 255, 255), id(cyd_ms5).state.c_str());
+
+      // ── FOOTER höger (y:208-240, x:162-319): Datum + Klocka ─────────────────
+
+      if (now.is_valid()) {
+        const char* dagar[]   = {"?","Sön","Mån","Tis","Ons","Tor","Fre","Lör"};
+        const char* manader[] = {"","Jan","Feb","Mar","Apr","Maj","Jun","Jul","Aug","Sep","Okt","Nov","Dec"};
+        char dbuf[22];
+        snprintf(dbuf, sizeof(dbuf), "%s %d %s  %02d:%02d",
+          dagar[now.day_of_week], now.day_of_month, manader[now.month],
+          now.hour, now.minute);
+        it.print(240, 220, id(font_xs), Color(255, 255, 255), TextAlign::TOP_CENTER, dbuf);
+      }
