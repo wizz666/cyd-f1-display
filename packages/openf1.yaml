@@ -1,0 +1,84 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# OpenF1 – HA Package
+# ─────────────────────────────────────────────────────────────────────────────
+
+input_boolean:
+
+  f1_notify_flags:
+    name: "F1 – Notiser: Flaggor (gul, grön)"
+    icon: mdi:flag-triangle
+
+  f1_notify_pitstops:
+    name: "F1 – Notiser: Pitstops"
+    icon: mdi:wrench
+
+  f1_ai_commentary:
+    name: "F1 – AI-kommentator (live)"
+    icon: mdi:microphone
+    initial: true
+
+  f1_ai_recap:
+    name: "F1 – AI-sessionreferat"
+    icon: mdi:newspaper
+    initial: true
+
+
+input_select:
+
+  f1_ai_provider:
+    name: "F1 – AI-leverantör"
+    icon: mdi:robot
+    options:
+      - auto          # Groq om nyckel finns, annars ha_ai_task
+      - groq          # Groq (gratis, snabb) – kräver API-nyckel nedan
+      - ha_ai_task    # HA:s inbyggda AI (Google AI / Anthropic etc.)
+      - anthropic     # Anthropic Claude direkt – kräver API-nyckel nedan
+      - openai        # OpenAI GPT-4o-mini – kräver API-nyckel nedan
+    initial: auto
+
+
+input_text:
+
+  f1_ai_api_key:
+    name: "F1 – AI API-nyckel"
+    icon: mdi:key
+    mode: password
+    max: 255
+    initial: ""
+
+
+input_number:
+
+  f1_followed_1:
+    name: "F1 – Förare 1 (nummer)"
+    icon: mdi:racing-helmet
+    min: 0
+    max: 99
+    step: 1
+    initial: 1     # Max Verstappen
+
+  f1_followed_2:
+    name: "F1 – Förare 2 (nummer)"
+    icon: mdi:racing-helmet
+    min: 0
+    max: 99
+    step: 1
+    initial: 44    # Lewis Hamilton
+
+  f1_followed_3:
+    name: "F1 – Förare 3 (nummer)"
+    icon: mdi:racing-helmet
+    min: 0
+    max: 99
+    step: 1
+    initial: 77    # Valtteri Bottas
+    # Sätt till 0 för att inaktivera en slot
+
+
+script:
+
+  f1_refresh_btn:
+    alias: "F1 – Uppdatera nu"
+    icon: mdi:refresh
+    sequence:
+      - service: pyscript.openf1_refresh

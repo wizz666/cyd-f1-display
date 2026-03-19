@@ -71,6 +71,33 @@ A full-featured Formula 1 race display for the **ESP32-2432S028** ("Cheap Yellow
 
 ---
 
+## Fresh Installation — Raspberry Pi
+
+New to Home Assistant? Follow these steps before anything else.
+
+### Step 0a — Install Home Assistant OS
+1. Download **Raspberry Pi Imager**: [rpi.io/imager](https://www.raspberrypi.com/software/)
+2. Insert your SD card (16 GB+ recommended)
+3. Choose **Other specific-purpose OS → Home assistants and home automation → Home Assistant**
+4. Write to SD card, insert into Raspberry Pi and power on
+5. Wait ~5 minutes, then open **http://homeassistant.local:8123** in your browser
+6. Complete the onboarding wizard
+
+### Step 0b — Install HACS
+HACS (Home Assistant Community Store) is required for pyscript and F1 Sensor.
+
+1. In HA: go to **Settings → Add-ons → Add-on Store**
+2. Search for **SSH & Web Terminal** → Install → Start → enable "Show in sidebar"
+3. Open the terminal and run:
+   ```bash
+   wget -O - https://get.hacs.xyz | bash -
+   ```
+4. Restart Home Assistant (**Settings → System → Restart**)
+5. Go to **Settings → Devices & Services → Add Integration** → search **HACS**
+6. Follow the GitHub authentication steps
+
+---
+
 ## Required Home Assistant Integrations
 
 ### 1. pyscript (HACS)
@@ -89,9 +116,10 @@ Provides next race info, results, standings and weather.
 
 ### 3. OpenF1 pyscript integration (custom)
 Provides live session data — positions, flags, tyres, Race Control messages.
-- See the [OpenF1 integration](../pyscript/openf1.py)
-- Requires `packages/openf1.yaml` for input helpers
-- Provides: `sensor.f1_session_status`, `sensor.f1_grid_display`, `sensor.f1_flag`, `sensor.f1_lap`, `sensor.f1_race_control_msg`, `sensor.f1_d1/d2/d3_*`
+- Both files are included in this repo: `pyscript/openf1.py` and `packages/openf1.yaml`
+- Copy them to your HA config as described in the installation steps below
+- Enable packages in `configuration.yaml` (see Step 2)
+- Provides: `sensor.f1_session_status`, `sensor.f1_flag`, `sensor.f1_lap`, `sensor.f1_race_control_msg`, and per-driver sensors
 
 ### 4. ESPHome (HACS or built-in)
 For compiling and flashing the display firmware.
@@ -105,6 +133,8 @@ For compiling and flashing the display firmware.
 |------|---------|
 | `esphome/cyd_countdown.yaml` | Main ESPHome firmware config |
 | `pyscript/cyd_f1_esphome.py` | HA sensor logic (runs every minute + on events) |
+| `pyscript/openf1.py` | Live race data via openf1.org API |
+| `packages/openf1.yaml` | HA input helpers for live mode (followed drivers, notifications) |
 | `scripts/update_f1_circuit.py` | Circuit image utility (kept as fallback) |
 | `esphome/f1_logo.png` | F1 logo (52×26px, BGR-swapped) |
 | `esphome/Roboto-Regular.ttf` | Font (regular) |
@@ -131,11 +161,25 @@ config/
 │       ├── australia.png
 │       ├── japan.png
 │       └── ... (all 22 circuits)
+├── packages/
+│   └── openf1.yaml
 ├── pyscript/
-│   └── cyd_f1_esphome.py
+│   ├── cyd_f1_esphome.py
+│   └── openf1.py
 └── scripts/
     └── update_f1_circuit.py
 ```
+
+Then enable packages and pyscript in `configuration.yaml`:
+```yaml
+homeassistant:
+  packages: !include_dir_named packages
+
+pyscript:
+  allow_all_imports: true
+```
+
+Restart Home Assistant after editing `configuration.yaml`.
 
 ### Step 3 – Configure secrets
 Add to `secrets.yaml`:
