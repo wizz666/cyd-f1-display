@@ -86,7 +86,7 @@ New to Home Assistant? Follow these steps before anything else.
 ### Step 0b — Install HACS
 HACS (Home Assistant Community Store) is required for pyscript and F1 Sensor.
 
-1. In HA: go to **Settings → Add-ons → Add-on Store**
+1. In HA: go to **Settings → Apps** (formerly "Add-ons")
 2. Search for **SSH & Web Terminal** → Install → Start → enable "Show in sidebar"
 3. Open the terminal and run:
    ```bash
@@ -123,7 +123,7 @@ Provides live session data — positions, flags, tyres, Race Control messages.
 
 ### 4. ESPHome (HACS or built-in)
 For compiling and flashing the display firmware.
-- Install via HACS or use the official ESPHome add-on in HA
+- Install via HACS or use the official ESPHome app (**Settings → Apps**)
 
 ---
 
