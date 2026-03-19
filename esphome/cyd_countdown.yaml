@@ -7,9 +7,6 @@ esphome:
       - light.turn_on:
           id: backlight
           brightness: 70%
-      - output.turn_on: rgb_r
-      - output.turn_on: rgb_g
-      - output.turn_on: rgb_b
 
 esp32:
   board: esp32dev
