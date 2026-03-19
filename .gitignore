@@ -1,0 +1,14 @@
+# Home Assistant
+secrets.yaml
+*.db
+*.log
+__pycache__/
+.storage/
+
+# ESPHome build artifacts
+.esphome/
+build/
+
+# OS
+.DS_Store
+Thumbs.db
