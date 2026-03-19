@@ -363,6 +363,18 @@ state.set("sensor.cyd_lap", f"Lap {lap}" if lap else "–")
 
 ---
 
+## 3D Printed Case
+
+The ESP32-2432S028 fits nicely in a 3D printed stand or enclosure. Here's a great model to get you started:
+
+**[MakerWorld Live Monitor Case for ESP32-2432S028](https://makerworld.com/en/models/1870648-makerworld-live-monitor-esp32#profileId-2351789)**
+
+A clean desk stand that holds the display at a comfortable viewing angle — perfect for an always-on F1 display.
+
+> Any case designed for the ESP32-2432S028 / CYD 2.8" will fit.
+
+---
+
 ## Support
 
 If you find this useful, a coffee is always appreciated ☕
