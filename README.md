@@ -36,7 +36,7 @@ A full-featured Formula 1 race display for the **ESP32-2432S028** ("Cheap Yellow
 │       Suzuka Circuit              15:22 (+7h)    │
 ├──────────────────────────────────────────────────┤
 │                        │ LIVE                    │
-│  DINA FÖRARE           │ GREEN FLAG              │
+│  YOUR DRIVERS           │ GREEN FLAG              │
 │  1  VER  Leader        │ Varv 32                 │
 │           S  12v       │ TRACK CLEAR             │
 │  4  HAM  +8.4s         │ AFTER INC T3            │
@@ -192,7 +192,7 @@ Set to `0` to disable a slot.
 When `sensor.f1_session_status` becomes `Race` or `Sprint`:
 
 1. `cyd_live_mode` → `"1"` (display switches within 30s)
-2. **Left column** → DINA FÖRARE: position, gap to leader, tyre compound+age for your 3 followed drivers
+2. **Left column** → YOUR DRIVERS: position, gap to leader, tyre compound+age for your 3 followed drivers
 3. **Right top** → LIVE: current flag (color-coded green/yellow/red), lap number, Race Control message
 4. **Right bottom** → LIVE RACE: live top-5 positions with gap and tyre
 5. When session ends → everything reverts automatically to standings/results
