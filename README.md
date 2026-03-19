@@ -285,6 +285,48 @@ display:
 
 ---
 
+## Localization — Changing Display Language
+
+The display labels are in Swedish by default but are just plain text strings in `esphome/cyd_countdown.yaml`. Search and replace the following to switch to English (or any other language):
+
+| Swedish (default) | English |
+|-------------------|---------|
+| `"KVAL"` | `"QUAL"` |
+| `"RACE"` | `"RACE"` *(same)* |
+| `"SPRINT"` | `"SPRINT"` *(same)* |
+| `"SENASTE RACE"` | `"LAST RACE"` |
+| `"FÖRARMÄSTERSKAPET"` | `"DRIVERS CHAMP."` |
+| `"DINA FÖRARE"` | `"YOUR DRIVERS"` |
+| `"LIVE RACE"` | `"LIVE RACE"` *(same)* |
+| `"Varv"` | `"Lap"` *(in cyd_f1_esphome.py)* |
+
+Also in `pyscript/cyd_f1_esphome.py`, change the day/month arrays at the top:
+
+```python
+# Swedish (default)
+DAYS   = ["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"]
+MONTHS = ["", "Jan", "Feb", "Mar", "Apr", "Maj", "Jun",
+          "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
+
+# English
+DAYS   = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+MONTHS = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+```
+
+And change the `"Varv"` prefix in the live function:
+```python
+# Swedish
+state.set("sensor.cyd_lap", f"Varv {lap}" if lap else "–")
+
+# English
+state.set("sensor.cyd_lap", f"Lap {lap}" if lap else "–")
+```
+
+> After editing `cyd_countdown.yaml` you need to reflash. After editing `cyd_f1_esphome.py` only a pyscript reload is needed (Developer Tools → Services → `pyscript.reload`).
+
+---
+
 ## SPI Pins (ESP32-2432S028)
 
 | Pin | GPIO |
