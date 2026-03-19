@@ -63,7 +63,7 @@ A full-featured Formula 1 race display for the **ESP32-2432S028** ("Cheap Yellow
 | **Display** | ESP32-2432S028 ("Cheap Yellow Display" / CYD) |
 | **Screen** | ILI9341, 320×240px, landscape |
 | **MCU** | ESP32 (dual-core, Wi-Fi) |
-| **Purchase** | Available on AliExpress — search "ESP32-2432S028" |
+| **Purchase** | [AliExpress — search "ESP32-2432S028"](https://www.aliexpress.com/wholesale?SearchText=ESP32-2432S028) |
 
 > **Note:** There are several CYD variants. This config is for the **TPM408-2.8** variant which requires `mirror_x: true` and `model: M5STACK` in ESPHome. Using `model: ILI9341` clips the display at x=240.
 
