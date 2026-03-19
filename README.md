@@ -1,3 +1,5 @@
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-Support_this_project-F16061?logo=ko-fi&logoColor=white)](https://ko-fi.com/wizz666)
+
 # CYD F1 Display
 
 A full-featured Formula 1 race display for the **ESP32-2432S028** ("Cheap Yellow Display") built with ESPHome and Home Assistant. Shows countdown to next race, live race data, championship standings, circuit layout images and more — all updating automatically without reflashing.
@@ -360,6 +362,12 @@ state.set("sensor.cyd_lap", f"Lap {lap}" if lap else "–")
 - Flash via [web.esphome.io](https://web.esphome.io) with factory binary
 
 ---
+
+## Support
+
+If you find this useful, a coffee is always appreciated ☕
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/wizz666)
 
 ## License
 
