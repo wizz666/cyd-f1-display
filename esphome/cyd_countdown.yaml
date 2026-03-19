@@ -149,17 +149,17 @@ image:
 
 # ── Fonter ────────────────────────────────────────────────────────────────────
 font:
-  - file: "Roboto-Regular.ttf"
+  - file: "Rajdhani-Regular.ttf"
     id: font_xs
-    size: 12
+    size: 13
     glyphs: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789åäöÅÄÖ°– .,:;-+/()!?"
 
-  - file: "Roboto-Regular.ttf"
+  - file: "Rajdhani-SemiBold.ttf"
     id: font_sm
-    size: 15
+    size: 16
     glyphs: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789åäöÅÄÖ°– .,:;-+/()!?"
 
-  - file: "Roboto-Bold.ttf"
+  - file: "ChakraPetch-SemiBold.ttf"
     id: font_md
     size: 20
     glyphs: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789åäöÅÄÖ°– .,:;-+/()!?"
