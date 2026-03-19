@@ -7,6 +7,9 @@ esphome:
       - light.turn_on:
           id: backlight
           brightness: 70%
+      - output.turn_on: rgb_r
+      - output.turn_on: rgb_g
+      - output.turn_on: rgb_b
 
 esp32:
   board: esp32dev
@@ -65,6 +68,20 @@ output:
     pin: GPIO21
     id: backlight_pin
     frequency: 5000 Hz
+
+  # RGB LED (active low) – sätt HIGH vid boot för att stänga av
+  - platform: gpio
+    pin: GPIO4
+    id: rgb_r
+    inverted: true
+  - platform: gpio
+    pin: GPIO16
+    id: rgb_g
+    inverted: true
+  - platform: gpio
+    pin: GPIO17
+    id: rgb_b
+    inverted: true
 
 light:
   - platform: monochromatic
