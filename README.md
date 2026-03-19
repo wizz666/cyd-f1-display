@@ -199,6 +199,15 @@ When `sensor.f1_session_status` becomes `Race` or `Sprint`:
 4. **Right bottom** → LIVE RACE: live top-5 positions with gap and tyre
 5. When session ends → everything reverts automatically to standings/results
 
+### Off-season mode (> 60 days to next race)
+When the season ends and the next race is more than 60 days away:
+
+1. **Header** → "OFF SEASON" in red + season year (e.g. "2026 SÄSONG"), countdown to next season on the right (e.g. "247d / till 2027")
+2. **Left column** → Season champion (driver name + points) and constructor champion
+3. **Right column** → Latest F1 news headlines from RSS (3 items with dates), updated every 30 minutes
+4. **Automatic return** — as soon as `sensor.f1_next_race` shows < 60 days to next race, display reverts to normal mode without any intervention
+5. **No reflash needed** — the transition is handled entirely by `cyd_f1_esphome.py`
+
 ### Circuit images
 All 22 circuits for the 2026 F1 calendar are pre-processed and compiled into the firmware:
 - BGR-swapped (required for 8BIT color palette)

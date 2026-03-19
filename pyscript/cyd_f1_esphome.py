@@ -1,14 +1,17 @@
 # =============================================================================
-# CYD F1 ESPHome – Sätter HA-states för CYD countdown-display  v2.0
+# CYD F1 ESPHome – Sätter HA-states för CYD countdown-display  v3.0
 # =============================================================================
 # Uppdaterar sensor-states som ESPHome-displayen prenumererar på:
 #   - Klocka hanteras av ESPHome självt (HA time-sync)
 #   - F1: nästa race, kval, nedräkning med färgkodning varje minut
 #   - F1: föregående race topp-3 vid startup + varje timme
 #   - F1: live race – positioner, flagg, varv, RC-meddelande
+#   - F1: off-season – säsongssammanfattning + nyheter från RSS
 # =============================================================================
 
 import datetime
+import urllib.request
+import xml.etree.ElementTree as ET
 
 CIRCUIT_SLUGS = {
     "albert park":       "australia",
@@ -68,6 +71,8 @@ FLAG_COLOR = {
 DAYS   = ["Mån", "Tis", "Ons", "Tor", "Fre", "Lör", "Sön"]
 MONTHS = ["", "Jan", "Feb", "Mar", "Apr", "Maj", "Jun",
           "Jul", "Aug", "Sep", "Okt", "Nov", "Dec"]
+
+RSS_URL = "https://www.motorsport.com/rss/f1/news/"
 
 
 def _circuit_slug(circuit_name):
@@ -150,7 +155,7 @@ def _update_cyd_standings():
 
 
 def _parse_compound(raw):
-    """Parsar '🔴 SOFT' → ('S', 'S') — kort bokstav för display."""
+    """Parsar '🔴 SOFT' → 'S' — kort bokstav för display."""
     raw_upper = raw.upper()
     for key, short in COMPOUND_SHORT.items():
         if key in raw_upper:
@@ -170,6 +175,34 @@ def _split_rc_msg(msg, max_len=19):
         split_at = max_len
     line2 = msg[split_at + 1:split_at + 1 + max_len]
     return msg[:split_at], line2
+
+
+def _do_fetch_news(url):
+    """Synkron RSS-hämtning (körs via task.executor)."""
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            xml_data = resp.read()
+        root = ET.fromstring(xml_data)
+        channel = root.find("channel")
+        if channel is None:
+            return []
+        all_items = [i for i in channel.findall("item")]
+        items = []
+        for item in all_items[:3]:
+            title    = (item.findtext("title") or "").strip()
+            pub_date = (item.findtext("pubDate") or "").strip()
+            try:
+                dt       = datetime.datetime.strptime(pub_date[:16], "%a, %d %b %Y")
+                date_str = f"{dt.day} {MONTHS[dt.month]}"
+            except Exception:
+                date_str = ""
+            if len(title) > 19:
+                title = title[:18] + "."
+            items.append((title, date_str))
+        return items
+    except Exception:
+        return []
 
 
 # ---------------------------------------------------------------------------
@@ -252,6 +285,58 @@ def cyd_esphome_update_f1():
         state.set("sensor.cyd_circuit_temp", f"{float(w_raw):.1f}")
     except Exception:
         state.set("sensor.cyd_circuit_temp", w_raw if w_raw else "–")
+
+    # ── Off-season detection ──────────────────────────────────────────────
+    race_start = attrs.get("race_start")
+    if race_start:
+        secs_os  = _seconds_until(race_start)
+        days_os  = int(secs_os // 86400)
+        is_off   = days_os > 60
+    else:
+        days_os  = 999
+        is_off   = False
+
+    if is_off:
+        try:
+            dt_next    = datetime.datetime.fromisoformat(race_start)
+            next_year  = dt_next.year
+            prev_year  = next_year - 1
+        except Exception:
+            next_year  = datetime.datetime.now().year + 1
+            prev_year  = datetime.datetime.now().year
+
+        state.set("sensor.cyd_off_season",    "1")
+        state.set("sensor.cyd_off_days",      f"{days_os}d")
+        state.set("sensor.cyd_off_year",      f"till {next_year}")
+        state.set("sensor.cyd_season_label",  f"{prev_year} SÄSONG")
+
+        # Mästare – från standings topp 1
+        standings_raw = _sget("sensor.f1_driver_standings", "")
+        champion = "–"
+        if "|" in standings_raw:
+            entries = [e for e in standings_raw.split("|") if e.strip()]
+            if entries:
+                dot      = entries[0].find(".")
+                champion = entries[0][dot+1:].strip() if dot >= 0 else entries[0].strip()
+        state.set("sensor.cyd_champion", champion[:14])
+
+        # Konstruktörsmästare (valfri sensor)
+        cs_raw      = _sget("sensor.f1_constructor_standings", "")
+        constructor = "–"
+        if "|" in cs_raw:
+            cs_entries = [e for e in cs_raw.split("|") if e.strip()]
+            if cs_entries:
+                dot         = cs_entries[0].find(".")
+                constructor = cs_entries[0][dot+1:].strip() if dot >= 0 else cs_entries[0].strip()
+        state.set("sensor.cyd_constructor", constructor[:14])
+
+    else:
+        state.set("sensor.cyd_off_season",   "0")
+        state.set("sensor.cyd_off_days",     "")
+        state.set("sensor.cyd_off_year",     "")
+        state.set("sensor.cyd_season_label", "")
+        state.set("sensor.cyd_champion",     "–")
+        state.set("sensor.cyd_constructor",  "–")
 
 
 # ---------------------------------------------------------------------------
@@ -358,3 +443,21 @@ def cyd_esphome_update_live(**kwargs):
             state.set(f"sensor.cyd_d{n}_name", "–")
             state.set(f"sensor.cyd_d{n}_gap",  "–")
             state.set(f"sensor.cyd_d{n}_tyre", "–")
+
+
+# ---------------------------------------------------------------------------
+# F1 nyheter från RSS – startup + varje halvtimme
+# ---------------------------------------------------------------------------
+
+@time_trigger("startup", "cron(30 * * * *)")
+async def cyd_esphome_update_news():
+    """Hämtar F1-nyheter från RSS-feed och sätter cyd_news_1/2/3."""
+    items = await task.executor(_do_fetch_news, RSS_URL)
+    for i in range(1, 4):
+        idx = i - 1
+        if idx < len(items):
+            state.set(f"sensor.cyd_news_{i}",      items[idx][0])
+            state.set(f"sensor.cyd_news_{i}_date",  items[idx][1])
+        else:
+            state.set(f"sensor.cyd_news_{i}",      "–")
+            state.set(f"sensor.cyd_news_{i}_date",  "")

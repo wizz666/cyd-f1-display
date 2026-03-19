@@ -300,6 +300,54 @@ text_sensor:
     id: cyd_circuit_temp
     entity_id: sensor.cyd_circuit_temp
 
+  - platform: homeassistant
+    id: cyd_off_season
+    entity_id: sensor.cyd_off_season
+
+  - platform: homeassistant
+    id: cyd_off_days
+    entity_id: sensor.cyd_off_days
+
+  - platform: homeassistant
+    id: cyd_off_year
+    entity_id: sensor.cyd_off_year
+
+  - platform: homeassistant
+    id: cyd_season_label
+    entity_id: sensor.cyd_season_label
+
+  - platform: homeassistant
+    id: cyd_champion
+    entity_id: sensor.cyd_champion
+
+  - platform: homeassistant
+    id: cyd_constructor
+    entity_id: sensor.cyd_constructor
+
+  - platform: homeassistant
+    id: cyd_news_1
+    entity_id: sensor.cyd_news_1
+
+  - platform: homeassistant
+    id: cyd_news_1_date
+    entity_id: sensor.cyd_news_1_date
+
+  - platform: homeassistant
+    id: cyd_news_2
+    entity_id: sensor.cyd_news_2
+
+  - platform: homeassistant
+    id: cyd_news_2_date
+    entity_id: sensor.cyd_news_2_date
+
+  - platform: homeassistant
+    id: cyd_news_3
+    entity_id: sensor.cyd_news_3
+
+  - platform: homeassistant
+    id: cyd_news_3_date
+    entity_id: sensor.cyd_news_3_date
+
 # ── Display (ILI9341, 320x240 landscape) ─────────────────────────────────────
 display:
   - platform: ili9xxx
@@ -323,38 +371,44 @@ display:
       // Bakgrund
       it.fill(Color(13, 17, 23));
 
+      // ── Lägesvariabler ────────────────────────────────────────────────────
+      bool live        = id(cyd_live_mode).state == "1";
+      bool off_season  = id(cyd_off_season).state == "1";
+      bool show_sprint = id(cyd_sprint_show).state == "1";
+      int  circuit_y   = (live || off_season) ? 155 : (show_sprint ? 155 : 150);
+
       // ── HEADER (y:0-32) ──────────────────────────────────────────────────
 
       it.image(2, 4, id(f1_logo));
 
-      // Race + bana (centrerade mellan logo och höger info)
-      it.print(155, 3,  id(font_xs), Color(255, 255, 255), TextAlign::TOP_CENTER, id(cyd_race_name).state.c_str());
-      it.print(155, 17, id(font_xs), Color(100, 116, 139), TextAlign::TOP_CENTER, id(cyd_circuit).state.c_str());
-
-      // Bantemp (höger, i linje med race name, vit)
-      {
-        std::string ct = id(cyd_circuit_temp).state;
-        bool valid = !ct.empty() && ct != "\xe2\x80\x93";
-        std::string ct_disp = valid ? (ct + "\xC2\xB0""C") : ct;
-        it.print(315, 3, id(font_xs), Color(255, 255, 255), TextAlign::TOP_RIGHT, ct_disp.c_str());
+      if (off_season) {
+        it.print(155, 3,  id(font_xs), Color(239, 68, 68),   TextAlign::TOP_CENTER, "OFF SEASON");
+        it.print(155, 17, id(font_xs), Color(100, 116, 139), TextAlign::TOP_CENTER, id(cyd_season_label).state.c_str());
+        it.print(315, 3,  id(font_xs), Color(255, 255, 255), TextAlign::TOP_RIGHT,  id(cyd_off_days).state.c_str());
+        it.print(315, 17, id(font_xs), Color(100, 116, 139), TextAlign::TOP_RIGHT,  id(cyd_off_year).state.c_str());
+      } else {
+        it.print(155, 3,  id(font_xs), Color(255, 255, 255), TextAlign::TOP_CENTER, id(cyd_race_name).state.c_str());
+        it.print(155, 17, id(font_xs), Color(100, 116, 139), TextAlign::TOP_CENTER, id(cyd_circuit).state.c_str());
+        {
+          std::string ct = id(cyd_circuit_temp).state;
+          bool valid = !ct.empty() && ct != "\xe2\x80\x93";
+          std::string ct_disp = valid ? (ct + "\xC2\xB0""C") : ct;
+          it.print(315, 3, id(font_xs), Color(255, 255, 255), TextAlign::TOP_RIGHT, ct_disp.c_str());
+        }
+        it.print(315, 17, id(font_xs), Color(100, 116, 139), TextAlign::TOP_RIGHT, id(cyd_circuit_time).state.c_str());
       }
-
-      // Circuit lokaltid (höger, i linje med circuit name, grå)
-      it.print(315, 17, id(font_xs), Color(100, 116, 139), TextAlign::TOP_RIGHT, id(cyd_circuit_time).state.c_str());
 
       auto now = id(ha_time).now();
 
       // ── SEPARATORER ──────────────────────────────────────────────────────
       it.horizontal_line(0,   33,  320, Color(30, 41, 59));  // header
       it.vertical_line(159,   34,  173, Color(30, 41, 59));  // vertikal mittlinje (y:34-207)
-      it.horizontal_line(161, 109, 159, Color(30, 41, 59));  // höger: mellan senaste race och standings
-      it.horizontal_line(161, 207, 159, Color(30, 41, 59));  // höger: under förarmästerskapet
+      it.horizontal_line(161, 109, 159, Color(30, 41, 59));  // höger: övre/nedre sektion
+      it.horizontal_line(161, 207, 159, Color(30, 41, 59));  // höger: under nedre sektion
 
-      // ── VÄNSTER: Live FÖRARE / SPRINT / KVAL / RACE ─────────────────────
-      bool show_sprint = id(cyd_sprint_show).state == "1";
-      int  circuit_y   = live ? 155 : (show_sprint ? 155 : 150);
+      // ── VÄNSTER ──────────────────────────────────────────────────────────
 
-      // Tyre-färg: första bokstaven i däcksträngen → Color
+      // Tyre-färg: första bokstaven → Color
       auto tc = [](const std::string& t) -> Color {
         if (!t.empty()) {
           if (t[0] == 'S') return Color(239, 68,  68);   // Soft  – röd
@@ -365,11 +419,17 @@ display:
         return Color(255, 255, 255);  // Hard – vit
       };
 
-      if (live) {
+      if (off_season) {
+        // ── OFF-SEASON: Säsongssammanfattning ────────────────────────────
+        it.print(5, 40,  id(font_xs), Color(100, 116, 139), "MÄSTARE");
+        it.print(5, 56,  id(font_sm), Color(255, 215, 0),   id(cyd_champion).state.c_str());
+        it.print(5, 82,  id(font_xs), Color(100, 116, 139), "KONSTR.");
+        it.print(5, 98,  id(font_xs), Color(255, 255, 255), id(cyd_constructor).state.c_str());
+
+      } else if (live) {
         // ── LIVE: Dina följda förare ──────────────────────────────────────
         it.print(5, 40, id(font_xs), Color(100, 116, 139), "DINA FÖRARE");
 
-        // Hjälplambda: position → färg
         auto pc = [](int p) -> Color {
           return p == 1 ? Color(255, 215, 0) :
                  p == 2 ? Color(192, 192, 192) :
@@ -377,21 +437,18 @@ display:
                           Color(255, 255, 255);
         };
 
-        // Förare 1
         { int p = atoi(id(cyd_d1_pos).state.c_str());
           it.print(5,  54, id(font_xs), pc(p),                id(cyd_d1_pos).state.c_str());
           it.print(22, 54, id(font_xs), Color(255, 255, 255), id(cyd_d1_name).state.c_str());
           it.print(5,  68, id(font_xs), Color(100, 116, 139), id(cyd_d1_gap).state.c_str());
           it.print(90, 68, id(font_xs), tc(id(cyd_d1_tyre).state), id(cyd_d1_tyre).state.c_str()); }
 
-        // Förare 2
         { int p = atoi(id(cyd_d2_pos).state.c_str());
           it.print(5,  86, id(font_xs), pc(p),                id(cyd_d2_pos).state.c_str());
           it.print(22, 86, id(font_xs), Color(255, 255, 255), id(cyd_d2_name).state.c_str());
           it.print(5,  100, id(font_xs), Color(100, 116, 139), id(cyd_d2_gap).state.c_str());
           it.print(90, 100, id(font_xs), tc(id(cyd_d2_tyre).state), id(cyd_d2_tyre).state.c_str()); }
 
-        // Förare 3
         { int p = atoi(id(cyd_d3_pos).state.c_str());
           it.print(5,  118, id(font_xs), pc(p),                id(cyd_d3_pos).state.c_str());
           it.print(22, 118, id(font_xs), Color(255, 255, 255), id(cyd_d3_name).state.c_str());
@@ -420,7 +477,7 @@ display:
         it.print(38, 89, id(font_xs), Color(255, 255, 255), id(cyd_race_count).state.c_str());
       }
 
-      // ── Circuit-bild (alltid synlig, y beror på läge) ─────────────────
+      // ── Circuit-bild (alltid synlig) ──────────────────────────────────────
       {
         const std::string& sl = id(cyd_circuit_slug).state;
         if      (sl == "australia")            it.image(14, circuit_y, id(circuit_australia));
@@ -447,11 +504,13 @@ display:
         else                                   it.image(14, circuit_y, id(circuit_japan));
       }
 
-      // ── HÖGER: Senaste race / LIVE flagg+varv+RC (x:162-319, y:34-108) ──────
+      // ── HÖGER TOPP: Senaste race / LIVE / F1 Nyheter (x:162-319, y:34-108) ──
 
-      bool live = id(cyd_live_mode).state == "1";
-
-      if (live) {
+      if (off_season) {
+        it.print(165, 37, id(font_xs), Color(100, 116, 139), "F1 NYHETER");
+        it.print(165, 55, id(font_xs), Color(255, 255, 255), id(cyd_news_1).state.c_str());
+        it.print(165, 69, id(font_xs), Color(100, 116, 139), id(cyd_news_1_date).state.c_str());
+      } else if (live) {
         it.print(165, 37, id(font_xs), Color(239, 68, 68),  "LIVE");
         it.print(165, 51, id(font_xs), col(id(cyd_flag_color).state), id(cyd_flag).state.c_str());
         it.print(165, 66, id(font_xs), Color(255, 255, 255), id(cyd_lap).state.c_str());
@@ -468,24 +527,38 @@ display:
         it.print(178, 94, id(font_xs), Color(205, 127, 50),  id(cyd_p3).state.c_str());
       }
 
-      // ── HÖGER: Förarmästerskap / LIVE positioner (x:162-319, y:110-206) ─────
+      // ── HÖGER BOTTEN: Standings / LIVE positioner / Nyheter (x:162-319, y:110-206) ──
 
-      if (live) {
+      if (off_season) {
+        it.print(165, 113, id(font_xs), Color(255, 255, 255), id(cyd_news_2).state.c_str());
+        it.print(165, 127, id(font_xs), Color(100, 116, 139), id(cyd_news_2_date).state.c_str());
+        it.print(165, 148, id(font_xs), Color(255, 255, 255), id(cyd_news_3).state.c_str());
+        it.print(165, 162, id(font_xs), Color(100, 116, 139), id(cyd_news_3_date).state.c_str());
+      } else if (live) {
         it.print(165, 113, id(font_xs), Color(239, 68, 68), "LIVE RACE");
+        it.print(165, 127, id(font_xs), Color(255, 215, 0),   "1");
+        it.print(178, 127, id(font_xs), Color(255, 215, 0),   id(cyd_ms1).state.c_str());
+        it.print(165, 141, id(font_xs), Color(192, 192, 192), "2");
+        it.print(178, 141, id(font_xs), Color(192, 192, 192), id(cyd_ms2).state.c_str());
+        it.print(165, 155, id(font_xs), Color(205, 127, 50),  "3");
+        it.print(178, 155, id(font_xs), Color(205, 127, 50),  id(cyd_ms3).state.c_str());
+        it.print(165, 169, id(font_xs), Color(255, 255, 255), "4");
+        it.print(178, 169, id(font_xs), Color(255, 255, 255), id(cyd_ms4).state.c_str());
+        it.print(165, 183, id(font_xs), Color(255, 255, 255), "5");
+        it.print(178, 183, id(font_xs), Color(255, 255, 255), id(cyd_ms5).state.c_str());
       } else {
         it.print(165, 113, id(font_xs), Color(100, 116, 139), "FÖRARMÄSTERSKAPET");
+        it.print(165, 127, id(font_xs), Color(255, 215, 0),   "1");
+        it.print(178, 127, id(font_xs), Color(255, 215, 0),   id(cyd_ms1).state.c_str());
+        it.print(165, 141, id(font_xs), Color(192, 192, 192), "2");
+        it.print(178, 141, id(font_xs), Color(192, 192, 192), id(cyd_ms2).state.c_str());
+        it.print(165, 155, id(font_xs), Color(205, 127, 50),  "3");
+        it.print(178, 155, id(font_xs), Color(205, 127, 50),  id(cyd_ms3).state.c_str());
+        it.print(165, 169, id(font_xs), Color(255, 255, 255), "4");
+        it.print(178, 169, id(font_xs), Color(255, 255, 255), id(cyd_ms4).state.c_str());
+        it.print(165, 183, id(font_xs), Color(255, 255, 255), "5");
+        it.print(178, 183, id(font_xs), Color(255, 255, 255), id(cyd_ms5).state.c_str());
       }
-
-      it.print(165, 127, id(font_xs), Color(255, 215, 0),   "1");
-      it.print(178, 127, id(font_xs), Color(255, 215, 0),   id(cyd_ms1).state.c_str());
-      it.print(165, 141, id(font_xs), Color(192, 192, 192), "2");
-      it.print(178, 141, id(font_xs), Color(192, 192, 192), id(cyd_ms2).state.c_str());
-      it.print(165, 155, id(font_xs), Color(205, 127, 50),  "3");
-      it.print(178, 155, id(font_xs), Color(205, 127, 50),  id(cyd_ms3).state.c_str());
-      it.print(165, 169, id(font_xs), Color(255, 255, 255), "4");
-      it.print(178, 169, id(font_xs), Color(255, 255, 255), id(cyd_ms4).state.c_str());
-      it.print(165, 183, id(font_xs), Color(255, 255, 255), "5");
-      it.print(178, 183, id(font_xs), Color(255, 255, 255), id(cyd_ms5).state.c_str());
 
       // ── FOOTER höger (y:208-240, x:162-319): Datum + Klocka ─────────────────
 
